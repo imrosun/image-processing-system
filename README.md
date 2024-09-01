@@ -22,19 +22,23 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## API Documentation 
+## API Documentation / Postman Collection APIs
 
-- [x] POST http://localhost:3000/process-image/upload
-      Upload csv file 
-      Body: `file`
-      Response: 200 OK {"requestId": "d024z175-be54-49cc-b610-60bec3599ba0"}
+- [x] POST https://image-processing-system-vmeb.onrender.com/process-image/upload
+  -   Here you will make file submission by uploading csv file which will have imageInputUrls that will start compressing after submission
+  -   Body: give Key as `file` and Attach csv file on Value
+  -   On success you will recieve requestId which will be in the form of shown below. It will help to check processing status. You can check the status of Image whether it is compressed or still in pending status.
+  -   Response: 200 OK {"requestId": "d024z175-be54-49cc-b610-60bec3599ba0"}
 
-- [x] GET http://localhost:3000/process-image/status/:requestId
-      ex: http://localhost:3000/process-image/status/d024z175-be54-49cc-b610-60bec3599ba0
-      Response: {"status": "Completed"} or {"status": "Pending, [if image is not compressd yet]"} 
+- [x] GET https://image-processing-system-vmeb.onrender.com/process-image/status/:requestId
+  -   Using the above endpoint you will be able to check processing status and see the compressed images in imageOutputUrls form
+  -   ex: https://image-processing-system-vmeb.onrender.com/process-image/status/d024z175-be54-49cc-b610-60bec3599ba0
+  -   Response: {"status": "Completed"} or {"status": "Pending"} 
 
-- [x] GET http://localhost:3000/process-image/
-      Response: [{List out the uploads}]
+- [x] GET https://image-processing-system-vmeb.onrender.com/process-image/
+  -   This will just Get all entries
+  -   Response: [{List out the uploads}]
+  -   This can be disabled if needed
 
 ## Description
 
@@ -115,11 +119,11 @@ $ npm run test:cov
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
-## Stay in touch
+<!-- ## Stay in touch
 
 - Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
 - Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- Twitter - [@nestframework](https://twitter.com/nestframework) -->
 
 ## License
 
