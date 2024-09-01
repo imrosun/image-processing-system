@@ -22,48 +22,59 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
+## API Documentation 
+
+- POST http://localhost:3000/process-image/upload
+  Upload csv file 
+  Body: `file`
+  Response: 200 OK {"requestId": "d024z175-be54-49cc-b610-60bec3599ba0"}
+
+- GET http://localhost:3000/process-image/status/:requestId
+  ex: http://localhost:3000/process-image/status/d024z175-be54-49cc-b610-60bec3599ba0
+  Response: {"status": "Completed"} or {"status": "Pending, [if image is not compressd yet]"} 
+
+- GET http://localhost:3000/process-image/
+  Response: [{List out the uploads}]
+
 ## Description
 
-Purpose: The project appears to be a Node.js application using NestJS that processes and compresses images and integrates with MongoDB and AWS S3.
+The project appears to be a Node.js application using NestJS that processes and compresses images and integrates with MongoDB and AWS S3.
 
-Key Features:
+# Key Features:
+- Image Processing:
+- Fetch Images: Retrieves images from given URLs.
+- Compress Images: Utilizes sharp for image compression and resizing. Implements a quality adjustment and resizing to reduce image size effectively.
+- Image Upload: Compresses images further using imagemin and mozjpeg, and uploads the processed images to AWS S3.
 
-Image Processing:
+# Database Integration:
+- MongoDB: Stores image processing records and metadata using Mongoose. Connects to MongoDB using a URI from environment variables.
+  
+# Configuration Management:
+- Uses @nestjs/config to handle configuration and environment variables.
 
-Fetch Images: Retrieves images from given URLs.
-Compress Images: Utilizes sharp for image compression and resizing. Implements a quality adjustment and resizing to reduce image size effectively.
-Image Upload: Compresses images further using imagemin and mozjpeg, and uploads the processed images to AWS S3.
-Database Integration:
+# Error Handling:
+- Handles errors during image processing and uploading, including network errors and invalid URLs.
 
-MongoDB: Stores image processing records and metadata using Mongoose. Connects to MongoDB using a URI from environment variables.
-Configuration Management:
+# Webhook Notifications:
+- Sends notifications via webhook upon processing completion, including information about failed URLs.
 
-Uses @nestjs/config to handle configuration and environment variables.
-Error Handling:
+# Data Management:
+- CSV Processing: Parses and processes CSV files containing image URLs and other metadata.
+- Database Operations: Provides CRUD operations for managing image processing records.
 
-Handles errors during image processing and uploading, including network errors and invalid URLs.
-Webhook Notifications:
+# Technologies Used:
+- NestJS: Framework for building the application.
+- Sharp: For image manipulation and compression.
+- AWS S3: For storing processed images.
+- Mongoose: For MongoDB interaction.
+- ConfigModule: For configuration management.
 
-Sends notifications via webhook upon processing completion, including information about failed URLs.
-Data Management:
-
-CSV Processing: Parses and processes CSV files containing image URLs and other metadata.
-Database Operations: Provides CRUD operations for managing image processing records.
-Technologies Used:
-
-NestJS: Framework for building the application.
-Sharp: For image manipulation and compression.
-Imagemin and Mozjpeg: For additional image compression.
-AWS S3: For storing processed images.
-Mongoose: For MongoDB interaction.
-ConfigModule: For configuration management.
-Application Flow:
-
-CSV Upload: Users upload CSV files containing image URLs.
-Image Processing: Images are fetched from URLs, resized, and compressed.
-Storage: Processed images are uploaded to AWS S3.
-Record Update: Database records are updated with the status and URLs of processed images.
-Notification: A webhook is triggered to notify completion and report any failed URLs.
+# Application Flow:
+- CSV Upload: Users upload CSV files containing image URLs.
+- Image Processing: Images are fetched from URLs, resized, and compressed.
+- Storage: Processed images are uploaded to AWS S3.
+- Record Update: Database records are updated with the status and URLs of processed images.
+- Notification: A webhook is triggered to notify completion and report any failed URLs.
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 

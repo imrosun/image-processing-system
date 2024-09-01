@@ -111,7 +111,7 @@ export class ProcessImageService {
     // Final compression with target quality
     const finalBuffer = await sharp(resizedBuffer)
       .jpeg({
-        quality: 10, // Final quality setting for desired reduction
+        quality: 20, // Final quality setting for desired reduction
         progressive: true,
         chromaSubsampling: '4:2:0'
       })
