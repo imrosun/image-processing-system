@@ -17,10 +17,5 @@
                 "DELETE"
             ]
         }
-    ],
-    "projectSettings": {
-    "framework": "nest",
-    "buildCommand": "npm run build",
-    "outputDirectory": "dist"
-  }
+    ]
 }
