@@ -2,8 +2,11 @@
     "version": 2,
     "builds": [
       {
-        "src": "dist/main.js",
-        "use": "@vercel/node"
+        "src": "package.json",
+        "use": "@vercel/node",
+        "config": {
+          "includeFiles": ["dist/**", "node_modules/**"]
+        }
       }
     ],
     "routes": [
@@ -11,6 +14,11 @@
         "src": "/(.*)",
         "dest": "dist/main.js"
       }
-    ]
+    ],
+    "build": {
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
   }
   
