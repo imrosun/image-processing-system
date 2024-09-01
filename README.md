@@ -81,6 +81,7 @@ The project appears to be a Node.js application using NestJS that processes and 
 ## Installation
 
 ```bash
+# clone the repository
 $ npm install
 ```
 
