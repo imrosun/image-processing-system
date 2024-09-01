@@ -1,3 +1,16 @@
+// {
+//   "compilerOptions": {
+//     "outDir": "./dist",
+//     "sourceMap": false,
+//     "declaration": false,
+//     "target": "ES2017",
+//     "module": "commonjs"
+//   },
+//   "include": ["src/**/*"],
+//   "exclude": ["node_modules", "test", "dist"]
+// }
+
+// old
 {
   "extends": "./tsconfig.json",
   "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]

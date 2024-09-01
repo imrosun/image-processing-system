@@ -1,0 +1,8 @@
+node_modules/
+src/
+test/
+coverage/
+.git/
+.vscode/
+*.log
+*.md
