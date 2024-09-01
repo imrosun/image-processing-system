@@ -1,12 +1,12 @@
 {
     "version": 2,
     "env": {
-        "MONGO_URI": "@image_mongo_uri",
-        "WEBHOOK_URL": "@image_webhook_uri",
-        "AWS_ACCESS_KEY_ID": "@image_aws_access_key_id",
-        "AWS_SECRET_ACCESS_KEY": "@image_aws_secret_access_key",
-        "AWS_REGION": "@image_aws_region",
-        "AWS_BUCKET_NAME": "@image_aws_bucket_name"
+        "MONGO_URI": "image_mongo_uri",
+        "WEBHOOK_URL": "image_webhook_uri",
+        "AWS_ACCESS_KEY_ID": "image_aws_access_key_id",
+        "AWS_SECRET_ACCESS_KEY": "image_aws_secret_access_key",
+        "AWS_REGION": "image_aws_region",
+        "AWS_BUCKET_NAME": "image_aws_bucket_name"
     },
     "builds": [
         {
