@@ -2,14 +2,14 @@
     "version": 2,
     "builds": [
         {
-            "src": "dist/main.ts",
+            "src": "dist/main.js",
             "use": "@vercel/node"
         }
     ],
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "dist/main.ts",
+            "dest": "dist/main.js",
             "methods": [
                 "GET",
                 "POST",
@@ -17,5 +17,10 @@
                 "DELETE"
             ]
         }
-    ]
+    ],
+    "projectSettings": {
+    "framework": "nest",
+    "buildCommand": "npm run build",
+    "outputDirectory": "dist"
+  }
 }
