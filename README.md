@@ -2,8 +2,6 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
 
-Webhooks: Without request an event accures/happening is webhooks [http callbacks] {using https response}
-
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
@@ -25,6 +23,47 @@ Webhooks: Without request an event accures/happening is webhooks [http callbacks
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
 ## Description
+
+Purpose: The project appears to be a Node.js application using NestJS that processes and compresses images and integrates with MongoDB and AWS S3.
+
+Key Features:
+
+Image Processing:
+
+Fetch Images: Retrieves images from given URLs.
+Compress Images: Utilizes sharp for image compression and resizing. Implements a quality adjustment and resizing to reduce image size effectively.
+Image Upload: Compresses images further using imagemin and mozjpeg, and uploads the processed images to AWS S3.
+Database Integration:
+
+MongoDB: Stores image processing records and metadata using Mongoose. Connects to MongoDB using a URI from environment variables.
+Configuration Management:
+
+Uses @nestjs/config to handle configuration and environment variables.
+Error Handling:
+
+Handles errors during image processing and uploading, including network errors and invalid URLs.
+Webhook Notifications:
+
+Sends notifications via webhook upon processing completion, including information about failed URLs.
+Data Management:
+
+CSV Processing: Parses and processes CSV files containing image URLs and other metadata.
+Database Operations: Provides CRUD operations for managing image processing records.
+Technologies Used:
+
+NestJS: Framework for building the application.
+Sharp: For image manipulation and compression.
+Imagemin and Mozjpeg: For additional image compression.
+AWS S3: For storing processed images.
+Mongoose: For MongoDB interaction.
+ConfigModule: For configuration management.
+Application Flow:
+
+CSV Upload: Users upload CSV files containing image URLs.
+Image Processing: Images are fetched from URLs, resized, and compressed.
+Storage: Processed images are uploaded to AWS S3.
+Record Update: Database records are updated with the status and URLs of processed images.
+Notification: A webhook is triggered to notify completion and report any failed URLs.
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
