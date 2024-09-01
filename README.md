@@ -23,19 +23,18 @@
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
 ## API Documentation 
-> [!POST] http://localhost:3000/process-image/upload
-> Upload csv file 
-> Body: `file`
-> Response: 200 OK {"requestId": "d024z175-be54-49cc-b610-60bec3599ba0"}
 
-> [!GET]
-> GET http://localhost:3000/process-image/status/:requestId
-> ex: http://localhost:3000/process-image/status/d024z175-be54-49cc-b610-60bec3599ba0
-> Response: {"status": "Completed"} or {"status": "Pending, [if image is not compressd yet]"} 
+- [x] POST http://localhost:3000/process-image/upload
+      Upload csv file 
+      Body: `file`
+      Response: 200 OK {"requestId": "d024z175-be54-49cc-b610-60bec3599ba0"}
 
-> [!IMPORTANTGET] GET
-> GET http://localhost:3000/process-image/
-> Response: [{List out the uploads}]
+- [x] GET http://localhost:3000/process-image/status/:requestId
+      ex: http://localhost:3000/process-image/status/d024z175-be54-49cc-b610-60bec3599ba0
+      Response: {"status": "Completed"} or {"status": "Pending, [if image is not compressd yet]"} 
+
+- [x] GET http://localhost:3000/process-image/
+      Response: [{List out the uploads}]
 
 ## Description
 
