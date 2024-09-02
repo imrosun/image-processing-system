@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ProcessImage, ProcessImageDocument } from './entities/process-image.entity';
@@ -19,7 +19,7 @@ export class ProcessImageService {
     @InjectModel(ProcessImage.name) private productModel: Model<ProcessImageDocument>,
     private readonly httpService: HttpService,
   ) {
-     this.s3 = new AWS.S3({
+    this.s3 = new AWS.S3({
       accessKeyId: process.env.AWS_ACCESS_KEY_ID,
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
       region: process.env.AWS_REGION,
@@ -43,80 +43,100 @@ export class ProcessImageService {
 
     const requestId = uuidv4();
 
-    for (const record of records) {
-      const product = new this.productModel({
-        serialNumber: parseInt(record['S. No.'], 10),
-        productName: record['Product Name'],
-        inputImageUrls: record['Input Image Urls'].split(',').map(url => url.trim()),
-        status: 'Pending',
-        requestId: requestId,
-      });
-      await product.save();
+    try {
+      for (const record of records) {
+        const product = new this.productModel({
+          serialNumber: parseInt(record['S. No.'], 10),
+          productName: record['Product Name'],
+          inputImageUrls: record['Input Image Urls'].split(',').map(url => url.trim()),
+          status: 'Pending',
+          requestId: requestId,
+        });
+        await product.save();
 
-      this.processImages(product); 
+        // Start image processing in the background
+        this.processImages(product);
+      }
+    } catch (error) {
+      console.error('Error processing CSV:', error.message);
+      throw new HttpException({
+        message: 'Failed to process CSV file',
+        error: error.message,
+      }, HttpStatus.BAD_GATEWAY);
     }
-    return { requestId };
+
+    return {
+      message: 'File uploaded successfully',
+      requestId,
+    };
   }
 
   async processImages(product: ProcessImageDocument) {
     const outputUrls = [];
     const failedUrls = [];
-  
-    for (const url of product.inputImageUrls) {
-      try {
-        const response = await firstValueFrom(this.httpService.get(url, { responseType: 'arraybuffer' }));
-        const compressedImage = await this.compressImage(response.data);
-        const outputUrl = await this.saveCompressedImage(compressedImage);
-        outputUrls.push(outputUrl);
-      } catch (error) {
-        console.error(`Failed to process image at ${url}:`, error.message);
-        outputUrls.push(''); // Empty entry for failed URL
-        failedUrls.push(url); // Collect failed URLs for reporting
+
+    try {
+      for (const url of product.inputImageUrls) {
+        try {
+          const response = await firstValueFrom(this.httpService.get(url, { responseType: 'arraybuffer' }));
+          const compressedImage = await this.compressImage(response.data);
+          const outputUrl = await this.saveCompressedImage(compressedImage);
+          outputUrls.push(outputUrl);
+        } catch (error) {
+          // console.error(`Failed to process image at ${url}:`, error.message);
+          outputUrls.push(''); // Empty entry for failed URL
+          failedUrls.push(url); // Collect failed URLs for reporting
+        }
       }
+    } catch (error) {
+      // console.error('Error processing images:', error.message);
+      throw new HttpException({
+        message: 'Failed to process images',
+        error: error.message,
+      }, HttpStatus.BAD_GATEWAY);
     }
+
     product.outputImageUrls = outputUrls;
-    product.status = failedUrls.length > 0 ? `Completed except for ${failedUrls.length} url` : 'Completed';
+    product.status = failedUrls.length > 0 ? `Completed except for ${failedUrls.length} url(s)` : 'Completed';
     await product.save();
-  
-    // Notify via webhook
-    await this.triggerWebhook(product.requestId, failedUrls);
+
+    // Notify via webhook 
+    try {
+      await this.triggerWebhook(product.requestId, failedUrls);
+    } catch (error) {
+      // console.error('Error triggering webhook:', error.message);
+    }
   }
 
   async compressImage(buffer: Buffer): Promise<Buffer> {
-    // Determine its original size
     const metadata = await sharp(buffer).metadata();
-    // Reduce by 50%
     const targetSizeRatio = 0.5;
-    // Initial resizing factor
     let resizeFactor = 1;
-    // Resize image until it approximates the desired file size reduction
     let resizedBuffer = buffer;
     let currentSize = buffer.length;
-  
-    // Start resizing
+
     while (currentSize > buffer.length * targetSizeRatio) {
-      resizeFactor *= 0.8; // Reduce size factor incrementally
+      resizeFactor *= 0.8;
       resizedBuffer = await sharp(buffer)
-        .resize({ width: Math.round(metadata.width * resizeFactor) }) 
+        .resize({ width: Math.round(metadata.width * resizeFactor) })
         .jpeg({
-          quality: 50, // Intermediate quality setting
+          quality: 50,
           progressive: true,
           chromaSubsampling: '4:2:0'
         })
         .toBuffer();
-  
+
       currentSize = resizedBuffer.length;
     }
-  
-    // Final compression with target quality
+
     const finalBuffer = await sharp(resizedBuffer)
       .jpeg({
-        quality: 20, // Final quality setting for desired reduction
+        quality: 20,
         progressive: true,
         chromaSubsampling: '4:2:0'
       })
       .toBuffer();
-  
+
     return finalBuffer;
   }
 
@@ -128,7 +148,15 @@ export class ProcessImageService {
       Body: buffer,
       ContentType: 'image/jpeg',
     };
-    await this.s3.upload(params).promise();
+    try {
+      await this.s3.upload(params).promise();
+    } catch (error) {
+      // console.error('Failed to upload image to S3:', error.message);
+      throw new HttpException({
+        message: 'Failed to upload image to S3',
+        error: error.message,
+      }, HttpStatus.BAD_GATEWAY);
+    }
     return `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${key}`;
   }
 
@@ -137,26 +165,50 @@ export class ProcessImageService {
     if (!webhookUrl) {
       throw new BadRequestException('Webhook URL is not configured');
     }
+
+    try {
+      new URL(webhookUrl);
+    } catch (error) {
+      console.error('Invalid webhook URL:', webhookUrl);
+      return;
+    }
+
     const payload = {
       requestId,
-      status: failedUrls.length > 0 ? `Completed ${failedUrls.length}` : 'Completed',
+      status: failedUrls.length > 0 ? `Completed except for ${failedUrls.length} urls` : 'Completed',
       failedUrls,
     };
-  
+
     try {
+      // console.log(`Triggering webhook for requestId: ${requestId} with payload:`, payload);
       await firstValueFrom(this.httpService.post(webhookUrl, payload));
+      // console.log('Webhook triggered successfully');
     } catch (error) {
-      console.error('Failed to trigger webhook', error.message);
+      // console.error('Failed to trigger webhook:', error.message);
     }
   }
 
-  handleWebhook(payload: any) {
-    console.log('Processing webhook data:', payload);
-    // Update the status in the database based on webhook payload
-    return this.productModel.updateOne(
-      { requestId: payload.requestId },
-      { $set: { status: payload.status } },
-    );
+  async handleWebhook(payload: any) {
+    // console.log('Processing webhook data:', payload);
+
+    try {
+      await this.productModel.updateMany(
+        { requestId: payload.requestId },
+        { $set: { status: payload.status } }
+      ).exec();
+    } catch (error) {
+      // console.error('Failed to update status:', error.message);
+      throw new HttpException('Failed to update status', HttpStatus.BAD_GATEWAY);
+    }
+  }
+
+  async findStatusByRequestId(requestId: string): Promise<string> {
+    const result = await this.productModel.findOne({ requestId }).exec();
+    if (result) {
+      return result.status;
+    } else {
+      throw new HttpException('RequestId not found', HttpStatus.NOT_FOUND);
+    }
   }
 
   async findAll(): Promise<ProcessImage[]> {

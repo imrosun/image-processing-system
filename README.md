@@ -28,12 +28,65 @@
   -   Here you will make file submission by uploading csv file which will have imageInputUrls that will start compressing after submission
   -   Body: give Key as `file` and Attach csv file on Value
   -   On success you will recieve requestId which will be in the form of shown below. It will help to check processing status. You can check the status of Image whether it is compressed or still in pending status.
-  -   Response: 200 OK {"requestId": "d024z175-be54-49cc-b610-60bec3599ba0"}
+  -   Response: {
+        "message": "File uploaded successfully",
+        "requestId": "80a03f07-e6e0-4a23-b356-c1d16c6a0434"
+      }
 
 - [x] GET https://image-processing-system-vmeb.onrender.com/process-image/status/:requestId
   -   Using the above endpoint you will be able to check processing status and see the compressed images in imageOutputUrls form
-  -   ex: https://image-processing-system-vmeb.onrender.com/process-image/status/d024z175-be54-49cc-b610-60bec3599ba0
-  -   Response: {"status": "Completed"} or {"status": "Pending"} 
+  -   ex: https://image-processing-system-vmeb.onrender.com/process-image/status/80a03f07-e6e0-4a23-b356-c1d16c6a0434
+  -   Response: {
+        "requestId": "80a03f07-e6e0-4a23-b356-c1d16c6a0434",
+        "status": "Completed",
+        "results": [
+          {
+            "_id": "66d503f1d6e5e4f113a785b",
+            "serialNumber": 1,
+            "productName": "SKU1",
+            "inputImageUrls": [
+              "https://placebear.com/g/200/200", 
+              "https://cdn.", 
+              "https://via.plaf"
+            ],
+             "outputImageUrls": [
+              "https://88.jpg",
+              "https://89.jpg",
+              "https://90.jpg"
+            ],
+            "status": "Completed",
+            "requestId": "80a03f07-e6e0-4a23-b356-c1d16c6a0434",
+            "__v": 1
+          },
+          {
+            "_id": "66d503f1d6e5e4f0113a785d",
+            "serialNumber": 2,
+            "productName": "SKU2",
+            "inputImageUrls": [
+              "https://www.png",
+              "https://y.png"
+            ],
+            "outputImageUrls": [
+              "https://d0.jpg",
+              "https://7.jpg"
+            ],
+            "status": "Completed",
+            "requestId": "80a03f07-e6e0-4a23-b356-c1d16c6a0434",
+            "__v": 1
+          }
+        ]
+      }
+
+- [x] POST https://image-processing-system-vmeb.onrender.com/process-image/webhook
+  -   This will give status in short 
+  -   Body: { 
+        "requestId": "80a03f07-e6e0-4a23-b356-c1d16c6a0434"
+      }
+  -   Response: {
+        "message": "Webhook processed successfully",
+        "requestId": "80a03f07-e6e0-4a23-b356-c1d16c6a0434",
+        "status": "Completed"
+      }
 
 - [x] GET https://image-processing-system-vmeb.onrender.com/process-image/
   -   This will just Get all entries

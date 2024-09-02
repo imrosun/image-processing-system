@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, BadRequestException, HttpStatus, HttpException } from '@nestjs/common';
 import { ProcessImageService } from './process-image.service';
 import { CreateProcessImageDto } from './dto/create-process-image.dto';
 import { UpdateProcessImageDto } from './dto/update-process-image.dto';
@@ -20,13 +20,47 @@ export class ProcessImageController {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
-    return this.processImageService.processCSV(file);
+    try {
+      const response = await this.processImageService.processCSV(file);
+      return {
+        message: 'File uploaded successfully',
+        requestId: response.requestId
+      };
+    } catch (error) {
+      throw new HttpException({
+        message: 'Failed to process file',
+        error: error.message
+      }, HttpStatus.BAD_GATEWAY);
+    }
   }
 
   @Post('webhook')
-  handleWebhook(@Body() body: any) {
-    console.log('Webhook data received:', body);
-    return this.processImageService.handleWebhook(body);
+  async handleWebhook(@Body() body: any) {
+    try {
+      const { requestId, status } = body;
+      
+      if (!requestId) {
+        throw new HttpException({
+          message: 'RequestId is required in webhook payload',
+        }, HttpStatus.BAD_REQUEST);
+      }
+
+      await this.processImageService.handleWebhook(body);
+
+      const updatedStatus = await this.processImageService.findStatusByRequestId(requestId);
+
+      return {
+        message: 'Webhook processed successfully',
+        requestId,
+        status: updatedStatus,
+      };
+    } catch (error) {
+      // console.error('Failed to process webhook:', error.message);
+      throw new HttpException({
+        message: 'Failed to process webhook',
+        error: error.message,
+      }, HttpStatus.BAD_GATEWAY);
+    }
   }
 
   @Get()
