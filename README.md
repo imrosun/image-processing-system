@@ -25,21 +25,28 @@
 ## API Documentation / Postman Collection APIs
 ### I have used "render" for hosting and when it is inactive then it can delay requests by 50 seconds or more. Kindly have patience till one request after that it becomes fast
 
+### Copy curl and paste on postman to test APIs
+
 - [x] POST https://image-processing-system-vmeb.onrender.com/process-image/upload
   -   Here you will make file submission by uploading csv file which will have imageInputUrls that will start compressing after submission
+```bash 
+curl --location 'https://image-processing-system-vmeb.onrender.com/process-image/upload' \
+--form 'file=@"/path/to/file"'
+```
   -   Body: give Key as `file` and Attach csv file on Value
   -   On success you will recieve requestId which will be in the form of shown below. It will help to check processing status. You can check the status of Image whether it is compressed or still in pending status.
-```bash  
   -   Response: {
         "message": "File uploaded successfully",
         "requestId": "80a03f07-e6e0-4a23-b356-c1d16c6a0434"
       }
-```
 
 - [x] GET https://image-processing-system-vmeb.onrender.com/process-image/status/:requestId
   -   Using the above endpoint you will be able to check processing status and see the compressed images in imageOutputUrls form
-  -   ex: https://image-processing-system-vmeb.onrender.com/process-image/status/80a03f07-e6e0-4a23-b356-c1d16c6a0434
-```bash  
+```bash 
+curl --location 'https://image-processing-system-vmeb.onrender.com/process-image/status/80a03f07-e6e0-4a23-b356-c1d16c6a0434' \
+--data ''
+```
+  -   ex: https://image-processing-system-vmeb.onrender.com/process-image/status/80a03f07-e6e0-4a23-b356-c1d16c6a0434  
   -   Response: {
         "requestId": "80a03f07-e6e0-4a23-b356-c1d16c6a0434",
         "status": "Completed",
@@ -80,11 +87,16 @@
           }
         ]
       }
-```
 
 - [x] POST https://image-processing-system-vmeb.onrender.com/process-image/webhook
   -   This will give status in short 
 ```bash  
+curl --location 'https://image-processing-system-vmeb.onrender.com/process-image/webhook' \
+--header 'Content-Type: application/json' \
+--data '{ 
+    "requestId": "80a03f07-e6e0-4a23-b356-c1d16c6a0434"
+}'
+```
   -   Body: { 
         "requestId": "80a03f07-e6e0-4a23-b356-c1d16c6a0434"
       }    
@@ -93,10 +105,13 @@
         "requestId": "80a03f07-e6e0-4a23-b356-c1d16c6a0434",
         "status": "Completed"
       }
-```
 
 - [x] GET https://image-processing-system-vmeb.onrender.com/process-image/
   -   This will just Get all entries
+```bash
+curl --location 'https://image-processing-system-vmeb.onrender.com/process-image/' \
+--header 'Content-Type: application/json'
+```
   -   Response: [{List out the uploads}]
   -   This can be disabled if needed
 
