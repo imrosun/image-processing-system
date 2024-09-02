@@ -23,19 +23,23 @@
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
 ## API Documentation / Postman Collection APIs
+### I have used "render" for hosting and when it is inactive then it can delay requests by 50 seconds or more. Kindly have patience till one request after that it becomes fast
 
 - [x] POST https://image-processing-system-vmeb.onrender.com/process-image/upload
   -   Here you will make file submission by uploading csv file which will have imageInputUrls that will start compressing after submission
   -   Body: give Key as `file` and Attach csv file on Value
   -   On success you will recieve requestId which will be in the form of shown below. It will help to check processing status. You can check the status of Image whether it is compressed or still in pending status.
+```bash  
   -   Response: {
         "message": "File uploaded successfully",
         "requestId": "80a03f07-e6e0-4a23-b356-c1d16c6a0434"
       }
+```
 
 - [x] GET https://image-processing-system-vmeb.onrender.com/process-image/status/:requestId
   -   Using the above endpoint you will be able to check processing status and see the compressed images in imageOutputUrls form
   -   ex: https://image-processing-system-vmeb.onrender.com/process-image/status/80a03f07-e6e0-4a23-b356-c1d16c6a0434
+```bash  
   -   Response: {
         "requestId": "80a03f07-e6e0-4a23-b356-c1d16c6a0434",
         "status": "Completed",
@@ -76,17 +80,20 @@
           }
         ]
       }
+```
 
 - [x] POST https://image-processing-system-vmeb.onrender.com/process-image/webhook
   -   This will give status in short 
+```bash  
   -   Body: { 
         "requestId": "80a03f07-e6e0-4a23-b356-c1d16c6a0434"
-      }
+      }    
   -   Response: {
         "message": "Webhook processed successfully",
         "requestId": "80a03f07-e6e0-4a23-b356-c1d16c6a0434",
         "status": "Completed"
       }
+```
 
 - [x] GET https://image-processing-system-vmeb.onrender.com/process-image/
   -   This will just Get all entries
